@@ -1,29 +1,32 @@
 # ECON-5200-Assignment-1
-# The Cost of Living Crisis: A Data-Driven Analysis
+# 1. Fetch: Retrieved 5 economic time series from FRED API
+fred = Fred(api_key='YOUR_API_KEY')
+official_cpi = fred.get_series('CPIAUCSL')
+tuition = fred.get_series('CUSR0000SEEB')
+# ... etc
 
-## The Problem
-Official CPI is a national average. For students—especially in Boston—budgets are concentrated in tuition and rent. This project asks whether national CPI understates student cost-of-living inflation.
+# 2. Normalize: Re-indexed all series to 2016=100 baseline
+base_value = series.loc['2016-01-01']
+indexed_series = (series / base_value) * 100
 
-## Methodology
-- Data source: FRED via `fredapi`
-- Proxies (CPI subcomponents): Tuition, Rent, Food Away From Home, Cable & Streaming
-- Normalize all series to **2016 = 100** to compare growth across different base years
-- Construct a weighted **Student SPI** (Laspeyres-style weighted index)
+# 3. Construct: Built weighted Student Price Index
+student_spi = (0.40 * tuition_idx + 0.30 * rent_idx + 
+               0.15 * food_idx + 0.10 * streaming_idx + 
+               0.05 * other_idx)
 
-## Key Findings
-- Tuition and rent generally outpace official CPI.
-- Student SPI exceeds national CPI, revealing an “inflation gap.”
-- Boston CPI can diverge from national CPI, highlighting regional pressure.
-
-## How to Run
-1. Open the notebook in `notebooks/` (Colab or Jupyter).
-2. Add your FRED API key.
-3. Run cells top-to-bottom to reproduce charts.
-
-## Repo Structure
-```text
-.
-├── notebooks/
-│   └── econ5200_cost_of_living.ipynb
-├── figures/
-└── README.md
+# 4. Compare: Visualized three-way comparison
+plt.plot(national_cpi, label='National CPI', color='grey')
+plt.plot(boston_cpi, label='Boston CPI', color='blue')
+plt.plot(student_spi, label='Student SPI', color='red')
+cost-of-living-analysis/
+├── data/
+│   ├── fred_data.csv
+│   └── student_basket.json
+├── src/
+│   ├── data_collection.py
+│   ├── index_construction.py
+│   └── visualization.py
+├── charts/
+│   └── inflation_comparison.png
+├── README.md
+└── requirements.txt
